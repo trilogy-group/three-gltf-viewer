@@ -516,13 +516,14 @@ export class Viewer {
     });
 
     // window.addEventListener('message', (event) => this.pushPollyQueue(text), false);
-    // setTimeout(() => {
-    // this.pushPollyQueue("Hey my name is Edi. I will be evaluating your understanding of Conservation of Mass today.", morphMeshes)
-    // }, 5000);
+    setTimeout(() => {
+    this.pushPollyQueue("Hey my name is Edi. I will be evaluating your understanding of Conservation of Mass today.", morphMeshes)
+    }, 5000);
     setTimeout(() => {
       blink(morphMeshes, blendShape)
     }, 2000); // 10000 milliseconds = 10 seconds
     // smile(morphMeshes, blendShape, this.pollyQueue.length > 0 || lipSyncRunning, 7000);
+    attentive(morphMeshes, blendShape)
 
   
     setInterval(() => {
@@ -571,30 +572,33 @@ export class Viewer {
     function randomDuration(min, max){
       return Math.floor(Math.random() * (max - min + 1) + min)*1000;
     }
-    // setInterval(() => {
-    //   if (this.pollyQueue.length === 0 && !lipSyncRunning && !pushing && stopwatch.getElapsedTime() > 3) {
+    setInterval(() => {
+      if (this.pollyQueue.length === 0 && !lipSyncRunning && !pushing && stopwatch.getElapsedTime() > 3) {
 
-    //     let counter = 0;
-    //     const intervalId = setInterval(() => {
-    //       if (counter >= 3) {
-    //         randomEyeMovements(morphMeshes, blendShape, true);
-    //         return;
-    //       }
-    //       randomEyeMovements(morphMeshes, blendShape);
-    //       counter++;
-    //     }, 1000);
+        let counter = 0;
+        const intervalId = setInterval(() => {
+          if (counter >= 3) {
+            randomEyeMovements(morphMeshes, blendShape, true);
+            return;
+          }
+          randomEyeMovements(morphMeshes, blendShape);
+          counter++;
+        }, 1000);
+        killAnimation(morphMeshes, blendShape, currentAnimation)
+        const randValue = Math.random()
+        console.log(currentAnimation)
+        // killAnimation(morphMeshes, blendShape, currentAnimation, nextExpression = expressions.smile)
+        // smile(morphMeshes, blendShape, this.pollyQueue.length > 0 || lipSyncRunning, randomDuration(6, 10));
 
-    //     const randValue = Math.random()
-    //     console.log(currentAnimation)
-    //     smile(morphMeshes, blendShape, this.pollyQueue.length > 0 || lipSyncRunning, randomDuration(6, 10));
-
-    //     // if (randValue < 0.5){
-    //     //   smirk(morphMeshes, blendShape, false, randomDuration(2, 4));
-    //     // } else {
-    //     //   smile(morphMeshes, blendShape, this.pollyQueue.length > 0 || lipSyncRunning, randomDuration(6, 10));
-    //     // } 
-    //   }
-    // }, 15000);
+        if (randValue < 0.5){
+          killAnimation(morphMeshes, blendShape, currentAnimation, expressions.smile)
+          smirk(morphMeshes, blendShape, false, randomDuration(2, 4));
+        } else {
+          killAnimation(morphMeshes, blendShape, currentAnimation, expressions.smile)
+          smile(morphMeshes, blendShape, this.pollyQueue.length > 0 || lipSyncRunning, randomDuration(6, 10));
+        } 
+      }
+    }, 4000);
 
     setInterval(() => {
       blink(morphMeshes, blendShape)
@@ -635,9 +639,9 @@ export class Viewer {
     //   sad(morphMeshes, blendShape)
     // }, 4000);
 
-    setTimeout(() => {
-      thoughtful(morphMeshes, blendShape)
-    }, 4000);
+    // setTimeout(() => {
+    //   thoughtful(morphMeshes, blendShape)
+    // }, 4000);
 
     // setInterval(() => {
     //   if (this.pollyQueue.length === 0 && !lipSyncRunning && !pushing && stopwatch.getElapsedTime() > 5) {
@@ -871,8 +875,6 @@ function thoughtful(morphMeshes, blendShape){
       animateMeshes(morphMeshes, blendShape[obj.shape] , startValue[blendShape[obj.shape]] , !reverse ? obj.endValue : 0, 400, false);
     }
 
-
-
     randomEyeMovements(morphMeshes, blendShape, false, "lookUpRight")
     await new Promise((resolve) => setTimeout(resolve, 1000))
     blink(morphMeshes, blendShape)
@@ -983,16 +985,18 @@ async function smile2(morphMeshes, blendShape, lipsing = true, pause = 2000){
   }
 }
 
-function delighted(morphMeshes, blendShape, lipsing = true, duration = 200){
+function delighted(morphMeshes, blendShape, lipsing = false, duration = 200){
   let startValue = morphMeshes[0].morphTargetInfluences
   currentAnimation = "delighted"
 
   runDelighted(lipsing)
 
   function runDelighted(reverse){
+    console.log('delighted')
     let expression = expressions.delighted
     for (let i = 0; i < expression.length; i ++) {
       const obj = expression[i]
+      console.log(obj.shape)
       animateMeshes(morphMeshes, blendShape[obj.shape] , startValue[blendShape[obj.shape]] , !reverse ? obj.endValue : 0, 400, false);
     }
   }
@@ -1032,11 +1036,16 @@ async function smirk(morphMeshes, blendShape, lipsing = true, pause = 2000){
   }
 }
 
-function killAnimation(morphMeshes, blendShape, name){
+function killAnimation(morphMeshes, blendShape, name, nextExpression = ""){
   let startValue = morphMeshes[0].morphTargetInfluences
   let expression = expressions[name]
+
+  const duration = 200
   for (let i = 0; i < expression.length; i ++) {
-    const shape = expression[i]
+    const obj = expression[i]
+    if (nextExpression !== "" && nextExpression.includes(obj.shape)){
+      continue
+    }
     animateMeshes(morphMeshes, blendShape[obj.shape] , startValue[blendShape[obj.shape]] , 0, duration, false);
   }
 }
@@ -1172,9 +1181,9 @@ function animateLipSync(mapped_blendshapes, morphMeshes, blendShape, startValue,
   });
 }
 
-const AWS_ACCESS_KEY_ID = ""
-const AWS_SECRET_ACCESS_KEY = ""
-const AWS_SESSION_TOKEN = ""
+const AWS_ACCESS_KEY_ID = "ASIAUCMU474JKLLO6CPZ"
+const AWS_SECRET_ACCESS_KEY = "xokG+q1CMgmup6xARxVn0GfboIlJazYIex+taFNJ"
+const AWS_SESSION_TOKEN = "IQoJb3JpZ2luX2VjEKr//////////wEaCmFwLXNvdXRoLTEiRzBFAiEA1ttMss7pnLNJ4Fpyec6TyS+f4nfMK2BUUJcjkMBYRx0CIAr3hCjjva/v/B91XIVEC++UALNfCZwiQNdnWZt9mI+CKowECNP//////////wEQAhoMMjgwMDIyMDIzOTU0Igy9NhezpMuzPacvlEYq4AMkPftqz+5huqaCVwTpODEb0joajGUTIrN5wpkbSkuOu/lQ9vWS/o4Lm1EdX56Lo0XcQYLR7cqLGVhby+lNRKstY/Qiyq4wB53hOdGioV0BpBsVtebj6MVthVZNeFUMck9I2Dak5A2HcFMLKnMtL4Jd+6P13LxE9+D5cZCfw+wuazxgCGtd7336dWbLCPccKaYwykdFSzmUG0d/HyVPnQ8Okze27z0tlkxmezYfgl3wxlNY8C7Kfx8ds9fKSk0m9iRE2TEwIKDcYIrcD+DcLfkXyEzfgpKxIUTJz7eNGDOrbGdGqSrojVPOOmks2DRIs6eWgT0wKzgRazMt75bsTLQjvyqx6HPJolCdFN1we+RC6dflvPtPq3GivzmIvy5/Rn1glRJd4vAVkUhOr6KW5D2ekHTpc88TWWGbETjndUaSRW/8QS4n1inKfPuEOghCQQkODeX3W6GBBWlqLBmIKl0Jn8CRgPyEL54kSbsT8AfJYXr+qkKcyMqDBeutQbNaBgtW2B0qxYL4iDqJX7lyfOXRlEoTFMTiXH93u+z0qT/Hn+6Ya5udh+CubFqDagNPFEq1IzBlVFacqgMkHxt5GgTLbJGbaQmXnWvU/LS3bDsZUi6jpvx8zXSZvr34s4EPirMw3JeyowY6lAEsRLS+Dc9mAiPjEEBkjLBj69TqIk7z6lbdpO6sWVIhZOgokVTgW9kUJpkkR1oEGM4H0jJeRlsM1B2kGFJ4v+MadA4F91gAosJ48HL5VniAFA99011kkSf9BQTFf2+U7uS+UpNfb0OIool8bNJ+NxtmhMovRbi7g7ZYCUrSWGurUHFAw3bzz6X3fYXUs0aUthHq94bp"
 
 AWS.config.update({
     accessKeyId: AWS_ACCESS_KEY_ID,
