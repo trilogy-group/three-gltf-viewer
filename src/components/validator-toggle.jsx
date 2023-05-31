@@ -9,12 +9,6 @@ export function ValidatorToggle ({issues, reportError}) {
   if (issues) {
     if (issues.numErrors) {
       message = `${issues.numErrors} errors.`;
-    } else if (issues.numWarnings) {
-      message = `${issues.numWarnings} warnings.`;
-    } else if (issues.numHints) {
-      message = `${issues.numHints} hints.`;
-    } else if (issues.numInfos) {
-      message = `${issues.numInfos} notes.`;
     } else {
       message = 'Model details';
     }

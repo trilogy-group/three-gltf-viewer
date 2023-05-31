@@ -19,14 +19,6 @@ export class Validator {
     this.el.appendChild(this.toggleEl);
   }
 
-  /**
-   * Runs validation against the given file URL and extra resources.
-   * @param  {string} rootFile
-   * @param  {string} rootPath
-   * @param  {Map<string, File>} assetMap
-   * @param  {Object} response
-   * @return {Promise}
-   */
   validate (rootFile, rootPath, assetMap, response) {
     // TODO: This duplicates a request of the three.js loader, and could
     // take advantage of THREE.Cache after r90.
@@ -37,17 +29,9 @@ export class Validator {
           this.resolveExternalResource(uri, rootFile, rootPath, assetMap)
       }))
       .then((report) => this.setReport(report, response))
-      .catch((e) => this.setReportException(e));
+      .catch((e) => console.log(e));
   }
 
-  /**
-   * Loads a resource (either locally or from the network) and returns it.
-   * @param  {string} uri
-   * @param  {string} rootFile
-   * @param  {string} rootPath
-   * @param  {Map<string, File>} assetMap
-   * @return {Promise<Uint8Array>}
-   */
   resolveExternalResource (uri, rootFile, rootPath, assetMap) {
     const baseURL = LoaderUtils.extractUrlBase(rootFile);
     const normalizedURL = rootPath + decodeURI(uri) // validator applies URI encoding.
@@ -82,78 +66,10 @@ export class Validator {
       }
     });
     report.errors = report.issues.messages.filter((msg) => msg.severity === 0);
-    report.warnings = report.issues.messages.filter((msg) => msg.severity === 1);
-    report.infos = report.issues.messages.filter((msg) => msg.severity === 2);
-    report.hints = report.issues.messages.filter((msg) => msg.severity === 3);
-    groupMessages(report);
     this.report = report;
+    console.log(this.report)
+    // this.setResponse(response);
 
-    this.setResponse(response);
-
-    this.toggleEl.innerHTML = ValidatorToggle(report);
-    this.showToggle();
-    this.bindListeners();
-
-    function groupMessages (report) {
-      const CODES = {
-        ACCESSOR_NON_UNIT: {
-          message: '{count} accessor elements not of unit length: 0. [AGGREGATED]',
-          pointerCounts: {}
-        },
-        ACCESSOR_ANIMATION_INPUT_NON_INCREASING: {
-          message: '{count} animation input accessor elements not in ascending order. [AGGREGATED]',
-          pointerCounts: {}
-        }
-      };
-
-      report.errors.forEach((message) => {
-        if (!CODES[message.code]) return;
-        if (!CODES[message.code].pointerCounts[message.pointer]) {
-          CODES[message.code].pointerCounts[message.pointer] = 0;
-        }
-        CODES[message.code].pointerCounts[message.pointer]++;
-      });
-      report.errors = report.errors.filter((message) => {
-        if (!CODES[message.code]) return true;
-        if (!CODES[message.code].pointerCounts[message.pointer]) return true;
-        return CODES[message.code].pointerCounts[message.pointer] < 2;
-      });
-      Object.keys(CODES).forEach((code) => {
-        Object.keys(CODES[code].pointerCounts).forEach((pointer) => {
-          report.errors.push({
-            code: code,
-            pointer: pointer,
-            message: CODES[code].message.replace('{count}', CODES[code].pointerCounts[pointer])
-          });
-        });
-      });
-    }
-  }
-
-  /**
-   * @param {Object} response
-   */
-  setResponse (response) {
-    const json = response && response.parser && response.parser.json;
-
-    if (!json) return;
-
-    if (json.asset && json.asset.extras) {
-      const extras = json.asset.extras;
-      this.report.info.extras = {};
-      if (extras.author) {
-        this.report.info.extras.author = linkify(escapeHTML(extras.author));
-      }
-      if (extras.license) {
-        this.report.info.extras.license = linkify(escapeHTML(extras.license));
-      }
-      if (extras.source) {
-        this.report.info.extras.source = linkify(escapeHTML(extras.source));
-      }
-      if (extras.title) {
-        this.report.info.extras.title = extras.title;
-      }
-    }
   }
 
   /**
@@ -161,20 +77,8 @@ export class Validator {
    */
   setReportException (e) {
     this.report = null;
-    this.toggleEl.innerHTML = this.toggleTpl({reportError: e, level: 0});
-    this.showToggle();
-    this.bindListeners();
-  }
+    this.toggleEl.innerHTML = "";
 
-  bindListeners () {
-    const reportToggleBtn = this.toggleEl.querySelector('.report-toggle');
-    reportToggleBtn.addEventListener('click', () => this.showLightbox());
-
-    const reportToggleCloseBtn = this.toggleEl.querySelector('.report-toggle-close');
-    reportToggleCloseBtn.addEventListener('click', (e) => {
-      this.hideToggle();
-      e.stopPropagation();
-    });
   }
 
   showToggle () {
@@ -185,20 +89,6 @@ export class Validator {
     this.toggleEl.classList.add('hidden');
   }
 
-  showLightbox () {
-    if (!this.report) return;
-    const tab = window.open('', '_blank');
-    tab.document.body.innerHTML = `
-      <!DOCTYPE html>
-      <title>glTF 2.0 validation report</title>
-      <link href="https://fonts.googleapis.com/css?family=Raleway:300,400" rel="stylesheet">
-      <link rel="stylesheet" href="{{location.protocol}}//{{location.host}}/style.css">
-      <style>
-        body { overflow-y: auto; }
-        html, body { background: #FFFFFF; }
-      </style>
-      ${ValidatorReport({...this.report, location})}`;
-  }
 }
 
 function escapeHTML(unsafe) {

@@ -2,8 +2,6 @@ import WebGL from 'three/examples/jsm/capabilities/WebGL.js';
 import { Viewer } from './viewer.js';
 import { SimpleDropzone } from 'simple-dropzone';
 import { Validator } from './validator.js';
-import { Footer } from './components/footer';
-import queryString from 'query-string';
 
 window.VIEWER = {};
 
@@ -12,7 +10,7 @@ if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
 } else if (!WebGL.isWebGLAvailable()) {
   console.error('WebGL is not supported in this browser.');
 }
-
+// npm install three@0.151.3
 class App {
 
   /**
@@ -20,8 +18,7 @@ class App {
    * @param  {Location} location
    */
   constructor (el, location) {
-
-    const hash = location.hash ? queryString.parse(location.hash) : {};
+    const hash = {};
     this.options = {
       kiosk: Boolean(hash.kiosk),
       model: hash.model || '',
@@ -40,6 +37,8 @@ class App {
     this.validator = new Validator(el);
 
     this.createDropzone();
+    let url2 = "https://raw.githubusercontent.com/bekhruz-ti/sandbox/main/poly283.glb"
+    // fetchModel(url2)
     this.hideSpinner();
 
     const options = this.options;
@@ -76,11 +75,29 @@ class App {
     this.viewer = new Viewer(this.viewerEl, this.options);
     return this.viewer;
   }
-
-  /**
-   * Loads a fileset provided by user action.
-   * @param  {Map<string, File>} fileMap
-   */
+  
+  
+   fetchModel(url) {
+    this.showSpinner();
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        const file = new File([blob], url.split('/').pop(), { type: blob.type });
+        const fileMap = new Map();
+        fileMap.set(file.name, file);
+        this.load(fileMap);
+      })
+      .catch((error) => {
+        this.onError(error);
+        this.hideSpinner();
+      });
+  }
+  
   load (fileMap) {
     let rootFile;
     let rootPath;
@@ -105,8 +122,8 @@ class App {
    * @param  {Map<string, File>} fileMap
    */
   view (rootFile, rootPath, fileMap) {
-
-    if (this.viewer) this.viewer.clear();
+    console.log(rootFile)
+    // if (this.viewer) this.viewer.clear();
 
     const viewer = this.viewer || this.createViewer();
 
@@ -124,7 +141,7 @@ class App {
       .catch((e) => this.onError(e))
       .then((gltf) => {
         if (!this.options.kiosk) {
-          this.validator.validate(fileURL, rootPath, fileMap, gltf);
+          console.log(1)
         }
         cleanup();
       });
@@ -142,7 +159,7 @@ class App {
     } else if (error && error.target && error.target instanceof Image) {
       message = 'Missing texture: ' + error.target.src.split('/').pop();
     }
-    window.alert(message);
+    // window.alert(message);
     console.error(error);
   }
 
@@ -154,8 +171,6 @@ class App {
     this.spinnerEl.style.display = 'none';
   }
 }
-
-document.body.innerHTML += Footer();
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -175,6 +190,4 @@ function isIFrame () {
     }
 }
 
-// bandwidth on this page is very high. hoping to
-// figure out what percentage of that is embeds.
 Tinybird.trackEvent('load', {embed: isIFrame()});

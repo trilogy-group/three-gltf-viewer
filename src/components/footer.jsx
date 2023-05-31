@@ -6,7 +6,7 @@ import { REVISION } from 'three';
 export function Footer () {
   return (
     <footer>
-      <a class="item" target="_blank" href="https://threejs.org/">
+      {/* <a class="item" target="_blank" href="https://threejs.org/">
         three.js r{REVISION}
       </a>
 
@@ -20,7 +20,7 @@ export function Footer () {
 
       <a class="item" target="_blank" href="https://github.com/donmccurdy/three-gltf-viewer">
         github
-      </a>
+      </a> */}
     </footer>
   );
 }
