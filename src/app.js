@@ -23,6 +23,7 @@ class App {
       kiosk: Boolean(hash.kiosk),
       model: hash.model || '',
       preset: hash.preset || '',
+      avatarPosition: 'center',
       cameraPosition: hash.cameraPosition
         ? hash.cameraPosition.split(',').map(Number)
         : null
