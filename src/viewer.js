@@ -75,7 +75,30 @@ const stopwatch = (() => {
     },
   };
 })();
-
+const viseme_map_azure = {
+  0: "mouthClose",
+  1: "ae_ax_ah_01", // æ, ə, ʌ
+  2: "aa_02", // ɑ
+  3: "ao_03", // ɔ
+  4: "ey_eh_uh_04", // ɛ, ʊ
+  5: "er_05", // ɝ
+  6: "y_iy_ih_ix_06", // j, i, ɪ
+  7: "w_uw_07", // w, u
+  8: "ow_08", // o
+  9: "aw_09", // aʊ
+  10: "oy_10", // ɔɪ
+  11: "ay_11", // aɪ
+  12: "h_12", // h
+  13: "r_13", // ɹ
+  14: "l_14", // l
+  15: "s_z_15", // s, z
+  16: "sh_ch_jh_zh_16", // ʃ, tʃ, dʒ, ʒ
+  17: "th_17", // ð
+  18: "f_v_18", // f, v
+  19: "d_t_n_19", // d, t, n, θ
+  20: "k_g_ng_20", // k, g, ŋ
+  21: "p_b_m_21", // p, b, m
+};
 const expressions = {
   "smile": [
       {"shape": "mouthSmileLeft", "endValue": 1},
@@ -680,6 +703,9 @@ export class Viewer {
   }
   
   async runRandomMovements (morphMeshes){
+    const visemes = await getAudioAzureVisemes("hello world how are you");
+    console.log(visemes);
+
     function randomDuration(min, max){
       return Math.floor(Math.random() * (max - min + 1) + min)*1000;
     }
@@ -1029,6 +1055,43 @@ function getBlendShapes(visemes){
 }
 
 
+
+import { SpeechConfig, SpeechSynthesizer, AudioConfig } from "microsoft-cognitiveservices-speech-sdk";
+
+// Callback function to handle viseme data
+function handleViseme(visemeData, e) {
+  const audioOffset = e.audioOffset / 10000;
+  const visemeId = e.visemeId;
+  visemeData.push({ audioOffset, visemeId });
+}
+
+async function getAudioAzureVisemes(text) {
+  const subscriptionKey = "";
+  const region = "eastus";
+  const voiceName = "en-US-JennyNeural";
+
+  const speechConfig = SpeechConfig.fromSubscription(subscriptionKey, region);
+  const audioConfig = AudioConfig.fromDefaultSpeakerOutput();
+  const speechSynthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
+
+  const visemeData = [];
+  speechSynthesizer.visemeReceived = (s, e) => handleViseme(visemeData, e);
+
+  const ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US"><voice name="${voiceName}">${text}</voice></speak>`;
+  await new Promise((resolve) => {
+    speechSynthesizer.speakSsmlAsync(
+      ssml,
+      (result) => {
+        resolve();
+      },
+      (error) => {
+        console.error(error);
+        resolve();
+      }
+    );
+  });
+  return visemeData;
+}
 
 async function synthesizeViseme(text) {
   const startViseme = new Date()
