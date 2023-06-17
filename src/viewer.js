@@ -34,6 +34,103 @@ import { GUI } from 'dat.gui';
 
 import { environments } from './environments.js';
 
+const expressions = {
+  "smile": [
+      {"shape": "eyeLookUpLeft", endValue: 0.2},
+      {"shape": "eyeLookUpRight", endValue: 0.2},
+      {"shape": "eyeSquintLeft", endValue: 0.2},
+      {"shape": "eyeSquintRight", endValue: 0.2},
+      {"shape": "jawOpen", endValue: 0.28},
+      {"shape": "mouthClose", endValue: 0.1},
+      {"shape": "mouthSmileLeft", endValue: 1},
+      {"shape": "mouthSmileRight", endValue: 1},
+      {"shape": "mouthShrugLower", endValue: 0.08},
+      {"shape": "mouthPressLeft", endValue: 0.11},
+      {"shape": "mouthPressRight", endValue: 0.11},
+      {"shape": "browInnerUp", endValue: 0.2},
+      {"shape": "cheekPuff", endValue: 0.5},
+    ],
+  "thoughtful": [
+      {"shape": "eyeLookUpRight", endValue: 0.4},
+      {"shape": "eyeLookUpLeft", endValue: 0.4},
+      {"shape": "eyeSquintLeft", endValue: 0.8},
+      {"shape": "eyeSquintRight", endValue: 0.8},
+      {"shape": "mouthPucker", endValue: 0.35},
+      {"shape": "mouthSmileLeft", endValue: 0.55},
+      {"shape": "mouthSmileRight", endValue: 0.55},
+      {"shape": "browDownLeft", endValue: 1},
+      {"shape": "browDownRight", endValue: 1},
+      {"shape": "browOuterUpLeft", endValue: 1},
+      {"shape":"browOuterUpRight", endValue: 1},
+      {"shape": "cheekSquintLeft", endValue: 0.4},
+      {"shape": "cheekSquintRight", endValue: 0.4},
+      {"shape": "mouthDimpleRight", endValue: 0.3},
+      {"shape": "mouthDimpleLeft", endValue: 0.3},
+      {"shape": "browInnerUp", endValue: 0.4}
+    ],
+    attentive: [
+      {"shape": "eyeLookUpLeft", endValue: 0.15},
+      {"shape": "eyeLookUpRight", endValue: 0.15},
+      {"shape": "eyeWideLeft", endValue: 0.3},
+      {"shape": "eyeWideRight", endValue: 0.3},
+      {"shape": "eyeSquintLeft", endValue: 0.4},
+      {"shape": "eyeSquintRight", endValue: 0.4},
+      {"shape": "mouthDimpleLeft", endValue: 0.4},
+      {"shape": "mouthDimpleRight", endValue: 0.4},
+      {"shape": "mouthSmileLeft", endValue: 0.8},
+      {"shape": "mouthSmileRight", endValue: 0.8},
+      {"shape": "mouthStretchLeft", endValue: 0.2},
+      {"shape": "mouthStretchRight", endValue: 0.2},
+      {"shape": "browInnerUp", endValue: 0.7},
+      {"shape": "browOuterUpLeft", endValue: 0.15},
+      {"shape": "browOuterUpRight", endValue: 0.15},
+      {"shape": "cheekPuff", endValue: 0.3},
+    ],  
+    "pleased": [
+      {"shape": "eyeLookUpLeft", endValue: 0.1},
+      {"shape": "eyeLookUpRight", endValue: 0.1},
+      {"shape": "eyeSquintLeft", endValue: 0.15},
+      {"shape": "eyeSquintRight", endValue: 0.15},
+      {"shape": "jawOpen", endValue: 0.15},
+      {"shape": "mouthClose", endValue: 0.05},
+      {"shape": "mouthSmileLeft", endValue: 0.8},
+      {"shape": "mouthSmileRight", endValue: 0.8},
+      {"shape": "mouthShrugLower", endValue: 0.4},
+      {"shape": "mouthPressLeft", endValue: 0.07},
+      {"shape": "mouthPressRight", endValue: 0.07},
+      {"shape": "browInnerUp", endValue: 0.15},
+      {"shape": "cheekPuff", endValue: 0.3},
+    ],
+    "playful": [
+      {"shape": "eyeSquintLeft", endValue: 0.25},
+      {"shape": "eyeSquintRight", endValue: 0.25},
+      {"shape": "jawForward", endValue: 0.3},
+      {"shape": "jawOpen", endValue: 0.4},
+      {"shape": "mouthLeft", endValue: 0.25},
+      {"shape": "mouthRight", endValue: 0.25},
+      {"shape": "mouthSmileLeft", endValue: 0.5},
+      {"shape": "mouthSmileRight", endValue: 0.5},
+      {"shape": "mouthShrugLower", endValue: 0.1},
+      {"shape": "mouthPressLeft", endValue: 0.1},
+      {"shape": "mouthPressRight", endValue: 0.1},
+      {"shape": "browInnerUp", endValue: 0.1},
+      {"shape": "cheekPuff", endValue: 0.15},
+      {"shape": "tongueOut", endValue: 0.8}
+    ],
+}
+let pushing = false
+
+let blendShape = {'eyeBlinkLeft': 0, 'eyeLookDownLeft': 1, 'eyeLookInLeft': 2, 'eyeLookOutLeft': 3, 'eyeLookUpLeft': 4, 'eyeSquintLeft': 5, 'eyeWideLeft': 6, 'eyeBlinkRight': 7, 'eyeLookDownRight': 8, 'eyeLookInRight': 9, 'eyeLookOutRight': 10, 'eyeLookUpRight': 11, 'eyeSquintRight': 12, 'eyeWideRight': 13, 'jawForward': 14, 'jawLeft': 15, 'jawRight': 16, 'jawOpen': 17, 'mouthClose': 18, 'mouthFunnel': 19, 'mouthPucker': 20, 'mouthRight': 21, 'mouthLeft': 22, 'mouthSmileLeft': 23, 'mouthSmileRight': 24, 'mouthFrownRight': 25, 'mouthFrownLeft': 26, 'mouthDimpleLeft': 27, 'mouthDimpleRight': 28, 'mouthStretchLeft': 29, 'mouthStretchRight': 30, 'mouthRollLower': 31, 'mouthRollUpper': 32, 'mouthShrugLower': 33, 'mouthShrugUpper': 34, 'mouthPressLeft': 35, 'mouthPressRight': 36, 'mouthLowerDownLeft': 37, 'mouthLowerDownRight': 38, 'mouthUpperUpLeft': 39, 'mouthUpperUpRight': 40, 'browDownLeft': 41, 'browDownRight': 42, 'browInnerUp': 43, 'browOuterUpLeft': 44, 'browOuterUpRight': 45, 'cheekPuff': 46, 'cheekSquintLeft': 47, 'cheekSquintRight': 48, 'noseSneerLeft': 49, 'noseSneerRight': 50, 'tongueOut': 51, 'ae_ax_ah_01': 52, 'aa_02': 53, 'ao_03': 54, 'ey_eh_uh_04': 55, 'er_05': 56, 'y_iy_ih_ix_06': 57, 'w_uw_07': 58, 'ow_08': 59, 'aw_09': 60, 'oy_': 61, 'ay_11': 62, 
+'h_12': 63, 'r_13': 64, 'l_14': 65, 's_z_15': 66, 'sh_ch_jh_zh_16': 67, 'th_dh_17': 68, 'f_v_18': 69, 'd_t_n_19': 70, 'k_g_ng_': 71, 'p_b_m_21': 72}
+
+let viseme_map = {
+    "b": "p_b_m_21", "p": "p_b_m_21", "m": "p_b_m_21", "d": "d_t_n_19", "t": "d_t_n_19", "n": "d_t_n_19", "s": "s_z_15", "z": "s_z_15", "f": "f_v_18", "v": "f_v_18", "k": "k_g_ng_", "g": "k_g_ng_", "ŋ": "k_g_ng_", "i": "y_iy_ih_ix_06", "y": "y_iy_ih_ix_06", "r": "r_13", "u": "w_uw_07", "w": "w_uw_07", "E": "ey_eh_uh_04", "e": "ey_eh_uh_04", "A": "aa_02", "a": "aa_02", "O": "ao_03", "o": "ao_03", "e": "ae_ax_ah_01", "æ": "ae_ax_ah_01", "ʌ": "ae_ax_ah_01", "ɑ": "ae_ax_ah_01", "o": "ow_08", "ʊ": "ow_08", "sil": "mouthClose", "S": "s_z_15", "T": "d_t_n_19", "@":"ey_eh_uh_04"
+}
+
+let lipSyncRunning   = false
+let currentAnimation = null
+Cache.enabled        = true;
+
 const DEFAULT_CAMERA = '[default]';
 
 const MANAGER = new LoadingManager();
@@ -58,10 +155,6 @@ export class Viewer {
     this.mixer = null;
     this.clips = [];
     this.gui = null;
-
-    if (options.preset) {
-      Tinybird.trackEvent('preset', {preset: options.preset});
-    }
 
     this.state = {
       environment: options.preset === Preset.ASSET_GENERATOR
@@ -260,9 +353,9 @@ export class Viewer {
 
     this.controls.reset();
 
-    object.position.x += (object.position.x - center.x);
-    object.position.y += (object.position.y - center.y);
-    object.position.z += (object.position.z - center.z);
+    object.position.x = 0;
+    object.position.y = -1.7;
+    object.position.z = 0;
     this.controls.maxDistance = size * 10;
     this.defaultCamera.near = size / 100;
     this.defaultCamera.far = size * 100;
@@ -276,9 +369,9 @@ export class Viewer {
     } else {
 
       this.defaultCamera.position.copy(center);
-      this.defaultCamera.position.x += size / 2.0;
-      this.defaultCamera.position.y += size / 5.0;
-      this.defaultCamera.position.z += size / 2.0;
+      this.defaultCamera.position.x = 0;
+      this.defaultCamera.position.y = 0;
+      this.defaultCamera.position.z = 0.68;
       this.defaultCamera.lookAt(center);
 
     }
@@ -308,6 +401,7 @@ export class Viewer {
       }
     });
 
+
     this.setClips(clips);
 
     this.updateLights();
@@ -316,17 +410,50 @@ export class Viewer {
     this.updateDisplay();
 
     window.VIEWER.scene = this.content;
+    this.runExpression('thoughtful', 700000, 400)
 
-    this.printGraph(this.content);
 
   }
 
-  printGraph (node) {
+  async runExpression (expressionName, pause = 5000, duration = 400, nextExpressionName = null){
+    let startValue = this.morphMeshes[0].morphTargetInfluences
+    let expression = expressions[expressionName]
+    
+    if (this.currentExpression){ //kill the current running expression 
+      this.killAnimation(this.currentExpression, expressionName)
+    }
+    this.currentExpression = expressionName // update the current running expression
+  
+    for (let i = 0; i < expression.length; i ++) { //run the animation for the new expression
+      const obj = expression[i]
+      this.animateMeshes(blendShape[obj.shape] , startValue[blendShape[obj.shape]] , obj.endValue, duration, false);
+    }
+    
+    await new Promise((resolve) => setTimeout(resolve, pause)) //run the expression for the time indicated by pause
+    if (nextExpressionName){  // if there is a next expression that must follow. run it 
+      this.runExpression(expressionName, pause*2, duration, null)
+    } else {
+      this.killAnimation(expressionName, null) // if no next next expression after the pause time kill the expression
+      this.currentExpression = null            // update the current running expression
+    }
+  }
 
-    console.group(' <' + node.type + '> ' + node.name);
-    node.children.forEach((child) => this.printGraph(child));
-    console.groupEnd();
-
+  async killAnimation(name, nextExpressionName = null){
+    console.log(name, nextExpressionName)
+    if (name) {
+      let startValue     = this.morphMeshes[0].morphTargetInfluences
+      let expression     = name === "all"     ? Object.keys(blendShape).map((key) => ({ "shape": key, "endValue": 1 })) : expressions[name]
+      let nextExpression = nextExpressionName ? expressions[nextExpressionName] : []
+  
+      const duration = 200
+      for (let i = 0; i < expression.length; i ++) {
+        const obj = expression[i]
+        if (nextExpression.includes(obj.shape)){
+          continue
+        }
+        this.animateMeshes(blendShape[obj.shape], startValue[blendShape[obj.shape]] , 0, duration, false);
+      }
+    }
   }
 
   /**
@@ -537,8 +664,7 @@ export class Viewer {
 
   addGUI () {
 
-    const gui = this.gui = new GUI({autoPlace: false, width: 260, hideable: true});
-
+    const gui = this.gui = new GUI({autoPlace: false, width: 450, hideable: true});
     // Display controls.
     const dispFolder = gui.addFolder('Display');
     const envBackgroundCtrl = dispFolder.add(this.state, 'background');
@@ -600,6 +726,32 @@ export class Viewer {
 
   }
 
+  async animateMeshes(blendShapeIndex, startValue, endValue, duration, finalValue = false, interp = 'lerp') {
+    await Promise.all(this.morphMeshes.map((morphMesh, i) => {
+      return this.animateMorphTarget(i, blendShapeIndex, startValue, endValue, duration, finalValue, interp);
+    }));
+    }
+    
+  animateMorphTarget(meshIndex, index, startValue, endValue, duration, finalValue = false, interp = 'lerp') {
+
+    const startTime = performance.now();
+    const update = () =>  {
+      const currentTime = performance.now();
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / duration, 1);
+      
+      const currentValue = interp === 'lerp' ? lerp(startValue, endValue, progress) : easeOutQuart(startValue, endValue, progress)
+      this.morphMeshes[meshIndex].morphTargetInfluences[index] = currentValue;
+    
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else if (finalValue !== false) {
+        this.animateMorphTarget(meshIndex, index, endValue, finalValue, duration, false);
+      }
+    }
+    update();
+    }
+
   updateGUI () {
     this.cameraFolder.domElement.style.display = 'none';
 
@@ -612,10 +764,10 @@ export class Viewer {
     this.animFolder.domElement.style.display = 'none';
 
     const cameraNames = [];
-    const morphMeshes = [];
+    this.morphMeshes = [];
     this.content.traverse((node) => {
       if (node.isMesh && node.morphTargetInfluences) {
-        morphMeshes.push(node);
+        this.morphMeshes.push(node);
       }
       if (node.isCamera) {
         node.name = node.name || `VIEWER__camera_${cameraNames.length + 1}`;
@@ -630,10 +782,9 @@ export class Viewer {
       this.cameraCtrl = this.cameraFolder.add(this.state, 'camera', cameraOptions);
       this.cameraCtrl.onChange((name) => this.setCamera(name));
     }
-
-    if (morphMeshes.length) {
+    if (this.morphMeshes.length) {
       this.morphFolder.domElement.style.display = '';
-      morphMeshes.forEach((mesh) => {
+      this.morphMeshes.forEach((mesh, meshIndex) => {
         if (mesh.morphTargetInfluences.length) {
           const nameCtrl = this.morphFolder.add({name: mesh.name || 'Untitled'}, 'name');
           this.morphCtrls.push(nameCtrl);
@@ -644,6 +795,15 @@ export class Viewer {
             if (key && mesh.morphTargetDictionary[key] === i) ctrl.name(key);
           });
           this.morphCtrls.push(ctrl);
+  
+          // Update blend shapes for all other meshes when mesh 0 is updated
+          if (meshIndex === 0) {
+            ctrl.onChange((value) => {
+              for (let j = 1; j < this.morphMeshes.length; j++) {
+                this.morphMeshes[j].morphTargetInfluences[i] = value;
+              }
+            });
+          }
         }
       });
     }
@@ -732,4 +892,13 @@ function isIOS() {
   ].includes(navigator.platform)
   // iPad on iOS 13 detection
   || (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
+}
+
+function lerp(start, end, t) {
+  return start * (1 - t) + end * t;
+}
+
+function easeOutQuart(start, end, t) {
+  t = 1-t
+  return end * (1 - t ** 4) + start * t ** 4
 }
