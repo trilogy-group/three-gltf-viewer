@@ -31,337 +31,9 @@ import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { GUI } from 'dat.gui';
 import { environments } from './environments.js';
+import { blendShape, expressions, headMovements } from './constants.js';
 
-const expressions = {
-  blink: {
-    eyeBlinkLeft: 1,
-    eyeBlinkRight: 1
-  },
-  smile: {
-    eyeLookUpLeft: 0.2,
-    eyeLookUpRight: 0.2,
-    eyeSquintLeft: 0.2,
-    eyeSquintRight: 0.2,
-    jawOpen: 0.28,
-    mouthClose: 0.1,
-    mouthSmileLeft: 1,
-    mouthSmileRight: 1,
-    mouthShrugLower: 0.08,
-    mouthPressLeft: 0.11,
-    mouthPressRight: 0.11,
-    browInnerUp: 0.2,
-    cheekPuff: 0.5,
-  },
-  happy: {
-    eyeLookUpLeft: 0.2,
-    eyeLookUpRight: 0.2,
-    eyeSquintLeft: 0.2,
-    eyeSquintRight: 0.2,
-    jawOpen: 0.28,
-    mouthClose: 0.1,
-    mouthSmileLeft: 1,
-    mouthSmileRight: 1,
-    mouthShrugLower: 0.08,
-    mouthPressLeft: 0.11,
-    mouthPressRight: 0.11,
-    browInnerUp: 0.2,
-    cheekPuff: 0.5,
-  },
-  surprised: {
-    mouthSmileLeft: 0.5,
-    mouthSmileRight: 0.5,
-    jawOpen: 0.4,  
-    eyeWideLeft: 0.45,
-    eyeWideRight: 0.45,
-    browOuterUpLeft: 0.6,
-    browOuterUpRight: 0.6,
-    browInnerUp: 0.9
-  },
-  happySurprised: {
-    mouthSmileLeft: 0.9,
-    mouthSmileRight: 0.9,
-    jawOpen: 0.4,  
-    eyeWideLeft: 1,
-    eyeWideRight: 1,
-    browOuterUpLeft: 0.6,
-    browOuterUpRight: 0.6,
-  },
-  happySurprisedReverse: {
-    eyeWideLeft: 1,
-    eyeWideRight: 1,
-    browOuterUpLeft: 0.6,
-    browOuterUpRight: 0.6,
-  },
-  pleased: {
-    eyeLookUpLeft: 0.1,
-    eyeLookUpRight: 0.1,
-    eyeSquintLeft: 0.15,
-    eyeSquintRight: 0.15,
-    jawOpen: 0.15,
-    mouthClose: 0.05,
-    mouthSmileLeft: 0.8,
-    mouthSmileRight: 0.8,
-    mouthShrugLower: 0.4,
-    mouthPressLeft: 0.07,
-    mouthPressRight: 0.07,
-    browInnerUp: 0.15,
-    cheekPuff: 0.3,
-  },
-  attentive: {
-    eyeLookUpLeft: 0.15,
-    eyeLookUpRight: 0.15,
-    eyeWideLeft: 0.3,
-    eyeWideRight: 0.3,
-    eyeSquintLeft: 0.4,
-    eyeSquintRight: 0.4,
-    mouthDimpleLeft: 0.4,
-    mouthDimpleRight: 0.4,
-    mouthSmileLeft: 0.8,
-    mouthSmileRight: 0.8,
-    mouthStretchLeft: 0.2,
-    mouthStretchRight: 0.2,
-    browInnerUp: 0.7,
-    browOuterUpLeft: 0.15,
-    browOuterUpRight: 0.15,
-    cheekPuff: 0.3,
-  },
-  thoughtful: {
-    eyeLookUpRight: 0.4,
-    eyeLookUpLeft: 0.4,
-    eyeSquintLeft: 0.9,
-    eyeSquintRight: 0.9,
-    mouthPucker: 0.35,
-    mouthSmileLeft: 0.55,
-    mouthSmileRight: 0.55,
-    mouthShrugLower: 0.1, 
-    mouthClose: 0.03,
-    browDownLeft: 0.75,
-    browDownRight: 0.75,
-    browOuterUpLeft: 1,
-    browOuterUpRight: 1,
-    cheekSquintLeft: 0.5,
-    cheekSquintRight: 0.5,
-    mouthDimpleRight: 0.3,
-    mouthDimpleLeft: 0.3,
-    browInnerUp: 0.4
-  },
-  curious: {
-    eyeLookUpLeft: 0.7,
-    eyeLookUpRight: 0.7,
-    mouthPressLeft: 0.5,
-    mouthPressRight: 0.5,
-    browInnerUp: 0.6,
-    browOuterUpLeft: 0.4,
-    browOuterUpRight: 0.4,
-  },
-  sad :{
-    browDownLeft: 0.7,
-    browDownRight: 0.7,
-    browInnerUp: 1,
-    mouthFrownLeft: 0.9,
-    mouthFrownRight: 0.9
-  },
-  sad2: {
-    eyeSquintLeft: 0.6,
-    eyeSquintRight: 0.6,
-    eyeLookDownLeft: 0.3,
-    eyeLookDownRight: 0.3,
-    mouthFrownLeft: 1,
-    mouthFrownRight: 1,
-    mouthDimpleLeft: 0.2,
-    mouthDimpleRight: 0.2,
-    mouthStretchLeft: 0.4,
-    mouthStretchRight: 0.4,
-    mouthShrugUpper: 0.6,
-    mouthLowerDownLeft: 0.2,
-    mouthLowerDownRight: 0.2,
-    browDownLeft: 0.4,
-    browDownRight: 0.4,
-    browInnerUp: 0.5,
-    cheekPuff: 0.15,
-    cheekSquintLeft: 0.6,
-    cheekSquintRight: 0.6,
-  },
-  smirkLeft: {
-    eyeLookUpRight: 0.2,
-    eyeLookUpLeft: 0.2,
-    eyeSquintRight: 0.2,
-    eyeSquintLeft: 0.2,
-    mouthClose: 0.1,
-    mouthPucker: 0.5,
-    mouthLeft: 0.65,
-    mouthSmileLeft: 0.45,
-    mouthSmileRight: 0.08,
-    mouthStretchRight: 0.05,
-    mouthUpperUpLeft: 0.15,
-    browDownLeft: 0.3,
-    browInnerUp: 0.4,
-    cheekSquintLeft: 0.5,
-    noseSneerLeft: 0.2,
-    jawLeft: 0.15,
-  },
-  smirkRight: {
-    eyeLookUpRight: 0.2,
-    eyeLookUpLeft: 0.2,
-    eyeSquintRight: 0.2,
-    eyeSquintLeft: 0.2,
-    mouthClose: 0.1,
-    mouthPucker: 0.5,
-    mouthRight: 0.65,
-    mouthSmileRight: 0.45,
-    mouthSmileLeft: 0.08,
-    mouthStretchLeft: 0.05,
-    mouthUpperUpRight: 0.15,
-    browDownRight: 0.3,
-    browInnerUp: 0.4,
-    cheekSquintRight: 0.5,
-    noseSneerRight: 0.2,
-    jawRight: 0.15,
-  },
-  delighted: {
-    mouthFunnel: 1,
-    mouthSmileLeft: 1,
-    mouthSmileRight: 1,
-    mouthDimpleLeft: 0.7,
-    mouthDimpleRight: 0.7,
-    mouthStretchLeft: 1,
-    mouthStretchRight: 1,
-    browInnerUp: 1,
-    browOuterUpLeft: 0.3,
-    browOuterUpRight: 0.3,
-    cheekSquintLeft: 0.3,
-    cheekSquintRight: 0.3,
-    eyeSquintRight: 0.2,
-    eyeSquintLeft: 0.2,
-    noseSneerRight: 0.1,
-    noseSneerLeft: 0.1,
-    jawOpen: 0.2,
-  },
-  neutral: {
-    eyeSquintRight: 0.25,
-    eyeSquintLeft: 0.25,
-    eyeLookUpRight: 0.2,
-    eyeLookUpLeft: 0.2,
-    jawOpen: 0.15,
-    mouthRollLower: 0.15,
-    mouthSmileLeft: 0.25,
-    mouthSmileRight: 0.25,
-    mouthDimpleLeft: 0.05,
-    mouthDimpleRight: 0.05,
-    mouthPressLeft: 0.35,
-    mouthPressRight: 0.35,
-    browInnerUp: 0.4,
-  },
-  lookUpRight: {
-    eyeLookUpLeft: 0.9,
-    eyeLookUpRight: 0.9,
-    eyeLookInLeft: 0.9,
-    eyeLookOutRight: 0.9,
-    browInnerUp: 0.8,
-    browOuterUpLeft: 0.8,
-    browOuterUpRight: 0.8,
-  },
-  lookUpLeft: {
-    eyeLookUpLeft: 0.9,
-    eyeLookUpRight: 0.9,
-    eyeLookOutLeft: 0.9,
-    eyeLookInRight: 0.9,
-    browInnerUp: 0.8,
-    browOuterUpLeft: 0.8,
-    browOuterUpRight: 0.8,
-  },
-  lookDownRight: {
-    eyeLookDownLeft: 0.9,
-    eyeLookDownRight: 0.9,
-    eyeLookInLeft: 0.9,
-    eyeLookOutRight: 0.9,
-    eyeBlinkRight: 0.1,
-    eyeBlinkLeft: 0.1,
-  },
-  lookDownLeft: {
-    eyeLookDownLeft: 0.9,
-    eyeLookDownRight: 0.9,
-    eyeLookOutLeft: 0.9,
-    eyeLookInRight: 0.9,
-    eyeBlinkRight: 0.1,
-    eyeBlinkLeft: 0.1,
-  }, 
-  playful: {
-    eyeSquintLeft: 0.25,
-    eyeSquintRight: 0.25,
-    jawForward: 0.3,
-    jawOpen: 0.4,
-    mouthLeft: 0.25,
-    mouthRight: 0.25,
-    mouthSmileLeft: 0.5,
-    mouthSmileRight: 0.5,
-    mouthShrugLower: 0.1,
-    mouthPressLeft: 0.1,
-    mouthPressRight: 0.1,
-    browInnerUp: 0.1,
-    cheekPuff: 0.15,
-    tongueOut: 0.8
-  }
-}
-let pushing = false
 
-// let blendShape = {'eyeBlinkLeft': 0, 'eyeLookDownLeft': 1, 'eyeLookInLeft': 2, 'eyeLookOutLeft': 3, 'eyeLookUpLeft': 4, 'eyeSquintLeft': 5, 'eyeWideLeft': 6, 'eyeBlinkRight': 7, 'eyeLookDownRight': 8, 'eyeLookInRight': 9, 'eyeLookOutRight': 10, 'eyeLookUpRight': 11, 'eyeSquintRight': 12, 'eyeWideRight': 13, 'jawForward': 14, 'jawLeft': 15, 'jawRight': 16, 'jawOpen': 17, 'mouthClose': 18, 'mouthFunnel': 19, 'mouthPucker': 20, 'mouthRight': 21, 'mouthLeft': 22, 'mouthSmileLeft': 23, 'mouthSmileRight': 24, 'mouthFrownRight': 25, 'mouthFrownLeft': 26, 'mouthDimpleLeft': 27, 'mouthDimpleRight': 28, 'mouthStretchLeft': 29, 'mouthStretchRight': 30, 'mouthRollLower': 31, 'mouthRollUpper': 32, 'mouthShrugLower': 33, 'mouthShrugUpper': 34, 'mouthPressLeft': 35, 'mouthPressRight': 36, 'mouthLowerDownLeft': 37, 'mouthLowerDownRight': 38, 'mouthUpperUpLeft': 39, 'mouthUpperUpRight': 40, 'browDownLeft': 41, 'browDownRight': 42, 'browInnerUp': 43, 'browOuterUpLeft': 44, 'browOuterUpRight': 45, 'cheekPuff': 46, 'cheekSquintLeft': 47, 'cheekSquintRight': 48, 'noseSneerLeft': 49, 'noseSneerRight': 50, 'tongueOut': 51, 'ae_ax_ah_01': 52, 'aa_02': 53, 'ao_03': 54, 'ey_eh_uh_04': 55, 'er_05': 56, 'y_iy_ih_ix_06': 57, 'w_uw_07': 58, 'ow_08': 59, 'aw_09': 60, 'oy_': 61, 'ay_11': 62, 
-// 'h_12': 63, 'r_13': 64, 'l_14': 65, 's_z_15': 66, 'sh_ch_jh_zh_16': 67, 'th_dh_17': 68, 'f_v_18': 69, 'd_t_n_19': 70, 'k_g_ng_': 71, 'p_b_m_21': 72}
-
-const blendShape = {
-  browDownLeft: 0,
-  browDownRight: 1,
-  browInnerUp: 2,
-  browOuterUpLeft: 3,
-  browOuterUpRight: 4,
-  cheekPuff: 5,
-  cheekSquintLeft: 6,
-  cheekSquintRight: 7,
-  eyeBlinkLeft: 8,
-  eyeBlinkRight: 9,
-  eyeLookDownLeft: 10,
-  eyeLookDownRight: 11,
-  eyeLookInLeft: 12,
-  eyeLookInRight: 13,
-  eyeLookOutLeft: 14,
-  eyeLookOutRight: 15,
-  eyeLookUpLeft: 16,
-  eyeLookUpRight: 17,
-  eyeSquintLeft: 18,
-  eyeSquintRight: 19,
-  eyeWideLeft: 20,
-  eyeWideRight: 21,
-  jawForward: 22,
-  jawLeft: 23,
-  jawOpen: 24,
-  jawRight: 25,
-  mouthClose: 26,
-  mouthClose_Substract: 27,
-  mouthDimpleLeft: 28,
-  mouthDimpleRight: 29,
-  mouthFrownLeft: 30,
-  mouthFrownRight: 31,
-  mouthFunnel: 32,
-  mouthLeft: 33,
-  mouthLowerDownLeft: 34,
-  mouthLowerDownRight: 35,
-  mouthPressLeft: 36,
-  mouthPressRight: 37,
-  mouthPucker: 38,
-  mouthRight: 39,
-  mouthRollLower: 40,
-  mouthRollUpper: 41,
-  mouthShrugLower: 42,
-  mouthShrugUpper: 43,
-  mouthSmileLeft: 44,
-  mouthSmileRight: 45,
-  mouthStretchLeft: 46,
-  mouthStretchRight: 47,
-  mouthUpperUpLeft: 48,
-  mouthUpperUpRight: 49,
-  noseSneerLeft: 50,
-  noseSneerRight: 51,
-  tongueOut: 52}
 
 let viseme_map = {
     "b": "p_b_m_21", "p": "p_b_m_21", "m": "p_b_m_21", "d": "d_t_n_19", "t": "d_t_n_19", "n": "d_t_n_19", "s": "s_z_15", "z": "s_z_15", "f": "f_v_18", "v": "f_v_18", "k": "k_g_ng_", "g": "k_g_ng_", "ŋ": "k_g_ng_", "i": "y_iy_ih_ix_06", "y": "y_iy_ih_ix_06", "r": "r_13", "u": "w_uw_07", "w": "w_uw_07", "E": "ey_eh_uh_04", "e": "ey_eh_uh_04", "A": "aa_02", "a": "aa_02", "O": "ao_03", "o": "ao_03", "e": "ae_ax_ah_01", "æ": "ae_ax_ah_01", "ʌ": "ae_ax_ah_01", "ɑ": "ae_ax_ah_01", "o": "ow_08", "ʊ": "ow_08", "sil": "mouthClose", "S": "s_z_15", "T": "d_t_n_19", "@":"ey_eh_uh_04"
@@ -608,8 +280,23 @@ export class Viewer {
 
     } else {
  
+      let avatarPositionsMap = {
+        "bottomLeft"  : [-0.15, -2.25, 1],
+        "bottomRight" : [ 0.15, -2.25, 1],
+        "topLeft"     : [-0.15, -2   , 1],
+        "topRight"    : [ 0.15, -2   , 1],
+        "center"      : [ 0   , -2.91, 0.75],
+        "middleLeft"  : [-0.15, -2.05, 1],
+        "middleRight" : [ 0.15, -2.05, 1],
+        "middleTop"   : [ 0   , -2   , 1],
+        "middleBottom": [ 0   , -2.15, 1],
+      }
+
+      let positionMultipliers = avatarPositionsMap['center']
       this.defaultCamera.position.copy(center);
-      this.defaultCamera.position.z += size;
+      this.defaultCamera.position.x += size*positionMultipliers[0];
+      this.defaultCamera.position.y += size*positionMultipliers[1];
+      this.defaultCamera.position.z += size*positionMultipliers[2];
       this.defaultCamera.lookAt(center);
 
     }
@@ -648,11 +335,18 @@ export class Viewer {
     this.updateDisplay();
 
     window.VIEWER.scene = this.content;
-    this.runExpression('happy', 10**10, 400)
+    // this.runExpression('smile', 10**10, 400)
+
+    // setInterval(()=>{
+      this.runExpression('down', 10**10, 750)
+    // }, 5000)
+
+    
   }
 
 
   async runExpression (expressionName, pause = 5000, duration = 400, nextExpressionName = null){
+    const expressions = headMovements
     let startValue = this.morphMeshes[0].morphTargetInfluences
     let expression = expressions[expressionName]
     
@@ -676,14 +370,15 @@ export class Viewer {
 
   async killAnimation(name, nextExpressionName = null){
     console.log(name, nextExpressionName)
+    const expressions = headMovements
     if (name) {
       let startValue     = this.morphMeshes[0].morphTargetInfluences
       let expression     = name === "all"     ? Object.keys(blendShape).forEach((key) => obj[key] = 0) : expressions[name]
       let nextExpression = nextExpressionName ? expressions[nextExpressionName] : {}
-      console.log(expression)
+      console.log(nextExpression)
       const duration = 200
       Object.keys(expression).forEach((v, i) => { //run the animation for the new expression
-        if (!nextExpression.includes(v)){
+        if (!nextExpression.hasOwnProperty(v)){
           this.animateMeshes(blendShape[v], startValue[blendShape[v]] , 0, duration, false);
         }
       })
@@ -965,9 +660,9 @@ export class Viewer {
 
   async animateMeshes(blendShapeIndex, startValue, endValue, duration, finalValue = false, interp = 'lerp') {
     await Promise.all(this.morphMeshes.map((morphMesh, i) => {
-      if (i !== this.morphMeshes.length - 1) {
+      // if (i !== this.morphMeshes.length - 1) {
         return this.animateMorphTarget(i, blendShapeIndex, startValue, endValue, duration, finalValue, interp);
-      }
+      // }
     }));
     }
     
@@ -1039,7 +734,7 @@ export class Viewer {
           // Update blend shapes for all other meshes when mesh 0 is updated
           if (meshIndex === 0) {
             ctrl.onChange((value) => {
-              for (let j = 1; j < this.morphMeshes.length - 1; j++) {
+              for (let j = 1; j < this.morphMeshes.length; j++) {
                 this.morphMeshes[j].morphTargetInfluences[i] = value;
               }
             });
